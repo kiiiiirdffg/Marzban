@@ -19,19 +19,20 @@ RUN apt-get update && \
 
 COPY ./requirements.txt /code/
 
-RUN python3 -m pip install --upgrade pip setuptools && \
-    pip install --no-cache-dir --upgrade -r /code/requirements.txt && \
-    pip install --no-cache-dir setuptools
+RUN python3 -m pip install --upgrade pip && \
+    pip install --no-cache-dir setuptools==69.5.1 && \
+    pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 
 FROM python:$PYTHON_VERSION-slim
 
 ENV PYTHONUNBUFFERED=1
-ENV PYTHON_LIB_PATH=/usr/local/lib/python${PYTHON_VERSION%.*}/site-packages
 
 WORKDIR /code
 
-COPY --from=build $PYTHON_LIB_PATH $PYTHON_LIB_PATH
+RUN pip install --no-cache-dir setuptools==69.5.1
+
+COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=build /usr/local/bin /usr/local/bin
 COPY --from=build /usr/local/share/xray /usr/local/share/xray
 
